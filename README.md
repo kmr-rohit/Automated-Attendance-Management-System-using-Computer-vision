@@ -1,4 +1,4 @@
-# Attendance-Management-System-using-Computer-vision
+# Automated-Attendance-Management-System-using-Computer-vision
 - # Problem Statement:
 To limit the manual hassel of taking attendace by professors or class incharge , replacing it with Automated system using Computer vision techniques.Incclude verification process, and two-factor authentication(using hash-key encryption) to keep data secure.Create a web platform to show the number of absents gained by the student on his/her profile dashboard. 
 - # Solution:
