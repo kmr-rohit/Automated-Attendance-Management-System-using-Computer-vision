@@ -33,14 +33,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
+
 import { Textarea } from "@/components/ui/textarea"
 import { toast } from "@/components/ui/use-toast"
 import { cn } from '@/lib/utils'
@@ -58,6 +51,9 @@ import {
   DrawerTrigger,
 } from "@/components/ui/drawer"
 import { set } from 'react-hook-form';
+import AddClassForm from "@/components/addClassForm"
+
+
 
 
 
@@ -79,7 +75,18 @@ export default async function dashboard() {
     return data;
   }
 
+  const fetchClasses = async () => {
+    const { data, error } =  await supabase
+      .from('classes')
+      .select('*')    
+      .eq('instructor_email', user?.email)
+    //console.log(data);
+    return data;
+  }
+
   const result = await fetchProfile();
+  console.log(result);
+  const classesToday = await fetchClasses();
   //console.log(result);
   
   const user1 = {
@@ -93,77 +100,125 @@ export default async function dashboard() {
     role : 'Teacher',
   };
 
-const attendenceSheet = [
-  {
-    id : 1,
-    courseCode: "ME201",
-    courseName: "Mechanical Vibrations",
-    Status: "Absent",
-    Date: "12/09/2021",
-  },
-  {
-    id : 1,
-    courseCode: "ME201",
-    courseName: "Mechanical Vibrations",
-    Status: "Present",
-    Date: "12/09/2021",
-  },
-  {
-    id : 1,
-    courseCode: "ME201",
-    courseName: "Mechanical Vibrations",
-    Status: "Present",
-    Date: "12/09/2021",
-  },
-  {
-    id : 1,
-    courseCode: "ME201",
-    courseName: "Mechanical Vibrations",
-    Status: "Absent",
-    Date: "12/09/2021",
-  },
-  {
-    id : 1,
-    courseCode: "ME201",
-    courseName: "Mechanical Vibrations",
-    Status: "Present",
-    Date: "12/09/2021",
-  },
-  {
-    id : 1,
-    courseCode: "ME201",
-    courseName: "Mechanical Vibrations",
-    Status: "Absent",
-    Date: "12/09/2021",
-  },
-]
+function StudentProfile(){
+  return(
+    <div className=' flex gap-20 items-center w-full justify-center mt-4'>
+    <Card className='w-[450px] h-[450px]'>
+      <CardHeader>
+        <CardTitle>Student Details</CardTitle>
+        <CardDescription>Details of the logged-in Student</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <p className='p-4 '>Email: {result.email}</p>
+        <p className='p-4 '>Bio: {result.bio}</p>
+        <p className='p-4 '>Branch: {result.branch}</p>
+        <p className='p-4 '>Semester: {result.semester}</p>
+      </CardContent>
+    </Card>
+    <Card className='w-[450px] h-[450px]'>
+    <CardHeader >
+      <CardTitle>QR Code </CardTitle>
+      <CardDescription>Your Generated QR Code</CardDescription>
+    </CardHeader>
+    <CardContent >
+    <div className="flex flex-col justify-center">
+      <AspectRatio  >
+        <Image src="https://images.ctfassets.net/lzny33ho1g45/6TK1TbLNZQ4iHr0PjdZS2Y/ffb5c5646b914435f10b085b012bc78d/zap-qr-1.png" width="330" height="330" alt="Image" className="rounded-md object-cover" />
+      </AspectRatio>
+      <Button>Download QR </Button>
+    </div>
+    </CardContent>
+    </Card>
+    </div>
+  )
+}
+function TeacherProfile(){
+  return(
+    <div className=' flex gap-20 items-center w-full justify-center mt-4'>
+    <Card className='w-[450px]'>
+      <CardHeader>
+        <CardTitle>Teacher Details</CardTitle>
+        <CardDescription>Details of the logged-in Teacher</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <p className='p-4 '>Email: {result.email}</p>
+        <p className='p-4 '>Bio: {result.bio}</p>
+        <p className='p-4 '>Branch: {result.branch}</p>
+        <div className='p-4'>Courses Enrolled :
+            <ul className='list-disc list-inside'>
+              {result.courses_enrolled?.map((course: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | React.ReactFragment | React.ReactPortal | React.PromiseLikeOfReactNode | null | undefined, index: React.Key | null | undefined) => (
+                <li key={index}>{course}</li>
+              ))}
+            </ul>
+          </div>
+      </CardContent>
+    </Card>
+    </div>
+  )
+}
 
-const classesToday = [
-  {
-    id: 1,
-    courseCode: "ME201",
-    name: 'Mechanical Vibrations',
-    time: '9:00 AM',
-  },
-  {
-    id: 2,
-    courseCode: "ME201",
-    name: 'Computer Networks',
-    time: '11:00 AM',
-  },
-  {
-    id: 3,
-    courseCode: "ME201",
-    name: 'Software Engineering',
-    time: '2:00 PM',
-  },
-  {
-    id: 4,
-    courseCode: "ME201",
-    name: 'Data Structures',
-    time: '4:00 PM',
-  }
-]
+async function AttendenceSheet(){
+  let attendenceSheet2: any[] = [];
+
+  const { data, error } =  await supabase
+      .from('classes')
+      .select('*')  
+  
+  data?.map((classToday) => {
+    result.courses_enrolled?.map((course: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | React.ReactFragment | React.ReactPortal | React.PromiseLikeOfReactNode | null | undefined, index: React.Key | null | undefined) => {
+      if(classToday.course_code == course){
+        attendenceSheet2.push({
+          courseCode: classToday.course_code,
+          courseName: classToday.course_name,
+          classStartTime: classToday.class_start_time,
+          classEndTime: classToday.class_end_time,
+          Status: "Present",
+          Date: classToday.class_start_time,
+        })
+      }
+    })
+  })
+
+  return(
+    <Table  className='p-4 m-auto w-[90%]'>
+            <TableCaption>Your Attendence Sheet.</TableCaption>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="">Course Code</TableHead>
+                <TableHead>Course Name</TableHead>
+                <TableHead>Class Date</TableHead>
+                <TableHead>Class Start Time</TableHead>
+                <TableHead>Class End Time</TableHead>
+                <TableHead>Status</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {attendenceSheet2.map((attendence) => (
+                <TableRow key={attendence.id}>
+                  <TableCell className="font-medium ">{attendence.courseCode}</TableCell>
+                  <TableCell>{attendence.courseName}</TableCell>
+                  <TableCell>{attendence.Date}</TableCell>
+                  <TableCell>{attendence.classStartTime}</TableCell>
+                  <TableCell>{attendence.classEndTime}</TableCell>
+                  <TableCell>
+                    {attendence.Status == "Present" ?
+                      <Button className="bg-green-500">
+                    {attendence.Status}
+                    </Button>
+                    :
+                      <Button className="bg-red-500">
+                    {attendence.Status}
+                    </Button>
+                    }
+                   </TableCell>  
+                </TableRow>
+              ))}
+            </TableBody>
+            
+          </Table>
+  );
+}
+
   return (
     <div className='w-full h-full' >
       <Header />
@@ -176,35 +231,9 @@ const classesToday = [
         </TabsList>
         <TabsContent value="profile">
         <div className=' flex gap-20 items-center w-full justify-center mt-4'>
-          <Card className='w-[450px]'>
-            <CardHeader>
-              <CardTitle>Teacher Details</CardTitle>
-              <CardDescription>Details of the logged-in Teacher</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p>Email: {result.email}</p>
-              <p>Bio: {result.bio}</p>
-              <p>Branch: {result.branch}</p>
-              <p>Semester: {result.semester}</p>
-            </CardContent>
-          </Card>
-        {result.role=='Student' && <Card className='w-[450px]'>
-          <CardHeader >
-            <CardTitle>QR Code </CardTitle>
-            <CardDescription>Your Generated QR Code</CardDescription>
-          </CardHeader>
-          <CardContent >
-          <div className="flex flex-col justify-center">
-            <AspectRatio >
-              <Image src="https://images.ctfassets.net/lzny33ho1g45/6TK1TbLNZQ4iHr0PjdZS2Y/ffb5c5646b914435f10b085b012bc78d/zap-qr-1.png" width="400" height="400" alt="Image" className="rounded-md object-cover" />
-            </AspectRatio>
-            <Button>Download QR </Button>
-          </div>
-          </CardContent>
-          </Card>}
-       
+          {result.role == 'Teacher' && TeacherProfile()}
+          {result.role=='Student' && StudentProfile() }
         </div>
-        
         </TabsContent>  
         <TabsContent value="markattendence">
         <div className='flex gap-20 items-center w-full justify-center mt-4'>
@@ -220,21 +249,20 @@ const classesToday = [
               <TableRow>
                 <TableHead className="">Course Code</TableHead>
                 <TableHead>Course Name</TableHead>
-                <TableHead>Time</TableHead>
+                <TableHead>Start Time</TableHead>
+                <TableHead>End Time</TableHead>
                 <TableHead>Status</TableHead>
                 
               </TableRow>
             </TableHeader>
             <TableBody>
-              {classesToday.map((classToday) => (
+              {classesToday?.map((classToday) => (
                 <TableRow key={classToday.id}>
-                  <TableCell className="font-medium ">{classToday.courseCode}</TableCell>
-                  <TableCell>{classToday.name}</TableCell>
-                  <TableCell>{classToday.time}</TableCell>
+                  <TableCell className="font-medium ">{classToday.course_code}</TableCell>
+                  <TableCell>{classToday.course_name}</TableCell>
+                  <TableCell>{classToday.class_start_time}</TableCell>
+                  <TableCell>{classToday.class_end_time}</TableCell>
                   <TableCell>
-                    {/* <Button className="bg-blue-500">
-                    Mark Attendence
-                    </Button> */}
                     <Drawer>
                       <DrawerTrigger asChild>
                         <Button className='bg-blue-500'>Mark Attendence</Button>
@@ -247,48 +275,14 @@ const classesToday = [
                 </TableRow>
               ))}
             </TableBody>
-            
           </Table>
-
+            <AddClassForm />
             </CardContent>
           </Card>
         </div>
       </TabsContent>
-
         <TabsContent value="attendencesheet">
-        <Table  className='p-4 m-auto w-[90%]'>
-            <TableCaption>Your Attendence Sheet.</TableCaption>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="">Course Code</TableHead>
-                <TableHead>Course Name</TableHead>
-                <TableHead>Class Date</TableHead>
-                <TableHead>Status</TableHead>
-                
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {attendenceSheet.map((attendence) => (
-                <TableRow key={attendence.id}>
-                  <TableCell className="font-medium ">{attendence.courseCode}</TableCell>
-                  <TableCell>{attendence.courseName}</TableCell>
-                  <TableCell>{attendence.Date}</TableCell>
-                  <TableCell>
-                    {attendence.Status == "Present" ?
-                      <Button className="bg-green-500">
-                    {attendence.Status}
-                    </Button>
-                    :
-                      <Button className="bg-red-500">
-                    {attendence.Status}
-                    </Button>
-}
-                   </TableCell>  
-                </TableRow>
-              ))}
-            </TableBody>
-            
-          </Table>
+          <AttendenceSheet />
         </TabsContent>
       </Tabs>
 
