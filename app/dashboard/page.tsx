@@ -176,21 +176,19 @@ const classesToday = [
         </TabsList>
         <TabsContent value="profile">
         <div className=' flex gap-20 items-center w-full justify-center mt-4'>
-        {(
-                <Card className='w-[450px]'>
-                  <CardHeader>
-                    <CardTitle>User Details</CardTitle>
-                    <CardDescription>Details of the logged-in user</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <p>Email: {result.email}</p>
-                    <p>Bio: {result.bio}</p>
-                    <p>Branch: {result.branch}</p>
-                    <p>Semester: {result.semester}</p>
-                  </CardContent>
-                </Card>
-              )}
-        <Card className='w-[450px]'>
+          <Card className='w-[450px]'>
+            <CardHeader>
+              <CardTitle>Teacher Details</CardTitle>
+              <CardDescription>Details of the logged-in Teacher</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p>Email: {result.email}</p>
+              <p>Bio: {result.bio}</p>
+              <p>Branch: {result.branch}</p>
+              <p>Semester: {result.semester}</p>
+            </CardContent>
+          </Card>
+        {result.role=='Student' && <Card className='w-[450px]'>
           <CardHeader >
             <CardTitle>QR Code </CardTitle>
             <CardDescription>Your Generated QR Code</CardDescription>
@@ -203,7 +201,7 @@ const classesToday = [
             <Button>Download QR </Button>
           </div>
           </CardContent>
-        </Card> 
+          </Card>}
        
         </div>
         
