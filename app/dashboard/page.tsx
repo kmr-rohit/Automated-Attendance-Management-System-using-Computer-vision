@@ -52,6 +52,7 @@ import {
 } from "@/components/ui/drawer"
 import { set } from 'react-hook-form';
 import AddClassForm from "@/components/addClassForm"
+import { get } from 'http';
 
 
 
@@ -163,21 +164,27 @@ async function AttendenceSheet(){
   const { data, error } =  await supabase
       .from('classes')
       .select('*')  
-  
-  data?.map((classToday) => {
-    result.courses_enrolled?.map((course: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | React.ReactFragment | React.ReactPortal | React.PromiseLikeOfReactNode | null | undefined, index: React.Key | null | undefined) => {
-      if(classToday.course_code == course){
-        attendenceSheet2.push({
-          courseCode: classToday.course_code,
-          courseName: classToday.course_name,
-          classStartTime: classToday.class_start_time,
-          classEndTime: classToday.class_end_time,
-          Status: "Present",
-          Date: classToday.class_start_time,
-        })
-      }
+
+
+  function getStatus(classId: number | undefined): string {
+    const isPresent = result.classes_status.includes(classId);
+    return isPresent ? "Present" : "Absent";
+  }
+
+    data?.map((classToday) => {
+      result.courses_enrolled?.map((course: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | React.ReactFragment | React.ReactPortal | React.PromiseLikeOfReactNode | null | undefined, index: React.Key | null | undefined) => {
+        if(classToday.course_code == course){
+          attendenceSheet2.push({
+            courseCode: classToday.course_code,
+            courseName: classToday.course_name,
+            classStartTime: classToday.class_start_time,
+            classEndTime: classToday.class_end_time,
+            Status: getStatus(classToday.id),
+            Date: classToday.class_date,
+          })
+        }
+      })
     })
-  })
 
   return(
     <Table  className='p-4 m-auto w-[90%]'>
