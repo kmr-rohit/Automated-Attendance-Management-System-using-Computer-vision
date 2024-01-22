@@ -87,6 +87,21 @@ export default async function dashboard() {
 
   const result = await fetchProfile();
   console.log(result);
+
+  // fetching Qr
+  const res = await fetch( "http://localhost:3000/getqr", {
+    method : "POST",
+    headers : {
+      "Content-Type" : "application/json",
+    },
+    body : JSON.stringify({
+      email : result.email,
+    }),
+  })
+  const res2 = await res.json();
+
+
+
   const classesToday = await fetchClasses();
   //console.log(result);
   
