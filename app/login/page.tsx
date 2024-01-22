@@ -112,6 +112,11 @@ export default function Login({
         >
           Sign Up
         </button>
+        {searchParams?.message && (
+          <p className="mt-4 p-4 bg-foreground/10 text-red-600 text-center">
+            {searchParams.message}
+          </p>
+        )}
       </form>
     </div>
   );
